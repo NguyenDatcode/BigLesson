@@ -174,11 +174,38 @@
 #         stateResult = False
 #         resultText = ""
 
+# def fit_to_box(img, box_w, box_h, mode="center"):
+#     """
+#     Scale + crop ảnh từ camera để khớp đúng với khung (box_w x box_h).
+#     mode = "center" -> crop giữa
+#     mode = "top"    -> ưu tiên giữ phần trên (ví dụ khuôn mặt)
+#     """
+#     h, w, _ = img.shape
+#     scale = max(box_w / w, box_h / h)  # scale sao cho ảnh >= khung
+#     new_w, new_h = int(w * scale), int(h * scale)
+#     img_resized = cv2.resize(img, (new_w, new_h))
+#
+#     # Crop
+#     if mode == "center":
+#         x_start = (new_w - box_w) // 2
+#         y_start = (new_h - box_h) // 2
+#     elif mode == "top":  # giữ phần trên (đầu, mặt)
+#         x_start = (new_w - box_w) // 2
+#         y_start = 0
+#     else:
+#         x_start, y_start = 0, 0
+#
+#     img_cropped = img_resized[y_start:y_start+box_h, x_start:x_start+box_w]
+#     return img_cropped
+
+
 import random
 import cv2
 import cvzone
 from cvzone.HandTrackingModule import HandDetector
 import time
+import numpy as np
+
 
 # Khởi tạo camera
 cap = cv2.VideoCapture(0)
@@ -284,94 +311,115 @@ while True:
 
     # ------------------- CHẾ ĐỘ MULTI PLAYER -------------------
     elif mode == "multi":
+        cap1 = cv2.VideoCapture(0)  # Player 1 (Laptop cam)
+        cap2 = cv2.VideoCapture(1)  # Player 2 (Iriun cam)
+
         imgBG = cv2.imread("Resources/BG2.png")
-        success, img = cap.read()
-        imgScaled = cv2.resize(img, (0, 0), None, 0.875, 0.875)
-        imgScaled = imgScaled[:, 80:480]
+        imgBG = cv2.resize(imgBG, (941, 531))
 
-        hands, img = detector.findHands(imgScaled)
+        detector1 = HandDetector(maxHands=1)
+        detector2 = HandDetector(maxHands=1)
 
-        if startGame:
-            if not stateResult:
-                timer = time.time() - initialTime
-                # Đồng hồ đếm ngược
-                cv2.putText(imgBG, str(int(timer)),
-                            (int(605 * 0.737), int(435 * 0.737)),  # (445, 320)
-                            cv2.FONT_HERSHEY_PLAIN, 6 * 0.737,
-                            (255, 0, 255), 4)
+        # Kích thước khung hiển thị
+        ph, pw = 314, 297
+        pos1 = (61, 172)
+        pos2 = (587, 173)
 
-                if timer > 3:
-                    stateResult = True
-                    player1Move, player2Move = None, None
-                    if len(hands) == 2:
-                        hand1, hand2 = hands[0], hands[1]
-                        fingers1 = detector.fingersUp(hand1)
-                        fingers2 = detector.fingersUp(hand2)
+        resultText = ""
+
+        while True:
+            success1, frame1 = cap1.read()
+            success2, frame2 = cap2.read()
+
+            imgBG_copy = imgBG.copy()
+
+            if not success1 or not success2:
+                cv2.putText(imgBG_copy, "Khong the truy cap camera!", (300, 360),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+                cv2.imshow("Rock Paper Scissors", imgBG_copy)
+                cv2.waitKey(1)
+                continue
+
+            # ----------- Dùng ảnh gốc để detect ----------
+            hands1, _ = detector1.findHands(frame1, flipType=False)
+            hands2, _ = detector2.findHands(frame2, flipType=False)
+
+            # ----------- Sau đó mới resize để ghép BG ----------
+            img1_resized = cv2.resize(frame1, (pw, ph))
+            img2_resized = cv2.resize(frame2, (pw, ph))
+
+            imgBG_copy[pos1[1]:pos1[1] + ph, pos1[0]:pos1[0] + pw] = img1_resized
+            imgBG_copy[pos2[1]:pos2[1] + ph, pos2[0]:pos2[0] + pw] = img2_resized
+
+            player1Move, player2Move = None, None
+
+            if startGame:
+                if not stateResult:
+                    timer = time.time() - initialTime
+                    countdown = 4 - int(timer)  # hiển thị 3 → 2 → 1
+
+                    if 1 <= countdown <= 3:
+                        cv2.putText(imgBG_copy, str(countdown), (600, 120),
+                                    cv2.FONT_HERSHEY_PLAIN, 6, (255, 0, 255), 4)
+                    elif countdown <= 0:
+                        stateResult = True
 
                         # Player1
-                        if fingers1 == [0, 0, 0, 0, 0]: player1Move = 1
-                        if fingers1 == [1, 1, 1, 1, 1]: player1Move = 2
-                        if fingers1 == [0, 1, 1, 0, 0]: player1Move = 3
+                        if hands1:
+                            fingers1 = detector1.fingersUp(hands1[0])
+                            if fingers1 == [0, 0, 0, 0, 0]: player1Move = 1
+                            if fingers1 == [1, 1, 1, 1, 1]: player1Move = 2
+                            if fingers1 == [0, 1, 1, 0, 0]: player1Move = 3
 
                         # Player2
-                        if fingers2 == [0, 0, 0, 0, 0]: player2Move = 1
-                        if fingers2 == [1, 1, 1, 1, 1]: player2Move = 2
-                        if fingers2 == [0, 1, 1, 0, 0]: player2Move = 3
+                        if hands2:
+                            fingers2 = detector2.fingersUp(hands2[0])
+                            if fingers2 == [0, 0, 0, 0, 0]: player2Move = 1
+                            if fingers2 == [1, 1, 1, 1, 1]: player2Move = 2
+                            if fingers2 == [0, 1, 1, 0, 0]: player2Move = 3
 
-                        # Overlay hình bàn tay Player1 và Player2
+                        # Overlay hình bàn tay
                         if player1Move:
                             imgHand1 = cv2.imread(f'Resources/{player1Move}.png', cv2.IMREAD_UNCHANGED)
-                            imgBG = cvzone.overlayPNG(imgBG, imgHand1,
-                                                      (int(149 * 0.737), int(310 * 0.737)))  # (110, 228)
+                            imgBG_copy = cvzone.overlayPNG(imgBG_copy, imgHand1, (200, 350))
                         if player2Move:
                             imgHand2 = cv2.imread(f'Resources/{player2Move}.png', cv2.IMREAD_UNCHANGED)
-                            imgBG = cvzone.overlayPNG(imgBG, imgHand2,
-                                                      (int(795 * 0.737), int(310 * 0.737)))  # (586, 228)
+                            imgBG_copy = cvzone.overlayPNG(imgBG_copy, imgHand2, (900, 350))
 
                         # So sánh kết quả
-                        if (player1Move == 1 and player2Move == 3) or \
-                                (player1Move == 2 and player2Move == 1) or \
-                                (player1Move == 3 and player2Move == 2):
-                            scores_multi[0] += 1
-                            resultText = "Player 1 Wins"
-                        elif (player2Move == 1 and player1Move == 3) or \
-                                (player2Move == 2 and player1Move == 1) or \
-                                (player2Move == 3 and player1Move == 2):
-                            scores_multi[1] += 1
-                            resultText = "Player 2 Wins"
-                        else:
-                            resultText = "Draw"
+                        if player1Move and player2Move:
+                            if (player1Move == 1 and player2Move == 3) or \
+                                    (player1Move == 2 and player2Move == 1) or \
+                                    (player1Move == 3 and player2Move == 2):
+                                scores_multi[0] += 1
+                                resultText = "Player 1 Wins"
+                            elif (player2Move == 1 and player1Move == 3) or \
+                                    (player2Move == 2 and player1Move == 1) or \
+                                    (player2Move == 3 and player1Move == 2):
+                                scores_multi[1] += 1
+                                resultText = "Player 2 Wins"
+                            else:
+                                resultText = "Draw"
 
-        # Gán camera preview vào giữa
-        # Gốc cũ: imgBG[234:654, 795:1195] = imgScaled
-        y1, y2 = int(234 * 0.737), int(654 * 0.737)  # (172, 482)
-        x1, x2 = int(795 * 0.737), int(1195 * 0.737)  # (586, 880)
-        imgBG[y1:y2, x1:x2] = cv2.resize(imgScaled, (x2 - x1, y2 - y1))
+            # Hiển thị kết quả và điểm số
+            cv2.putText(imgBG_copy, resultText, (500, 150),
+                        cv2.FONT_HERSHEY_DUPLEX, 2, (0, 255, 255), 3)
 
-        # Hiển thị kết quả và điểm số
-        cv2.putText(imgBG, resultText,
-                    (int(550 * 0.737), int(435 * 0.737)),  # (405, 320)
-                    cv2.FONT_HERSHEY_DUPLEX, 2 * 0.737,
-                    (0, 255, 255), 3)
+            cv2.putText(imgBG_copy, str(scores_multi[0]), (300, 120),
+                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
+            cv2.putText(imgBG_copy, str(scores_multi[1]), (1000, 120),
+                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
 
-        cv2.putText(imgBG, str(scores_multi[0]),
-                    (int(410 * 0.737), int(215 * 0.737)),  # (302, 158)
-                    cv2.FONT_HERSHEY_PLAIN, 4 * 0.737,
-                    (255, 255, 255), 6)
+            cv2.imshow("Rock Paper Scissors", imgBG_copy)
 
-        cv2.putText(imgBG, str(scores_multi[1]),
-                    (int(1112 * 0.737), int(215 * 0.737)),  # (820, 158)
-                    cv2.FONT_HERSHEY_PLAIN, 4 * 0.737,
-                    (255, 255, 255), 6)
-
-        cv2.imshow("Rock Paper Scissors", imgBG)
-
-        key = cv2.waitKey(1)
-        if key == ord('s'):
-            startGame = True
-            initialTime = time.time()
-            stateResult = False
-            resultText = ""
-        if key == ord('m'):
-            mode = "menu"
-
+            key = cv2.waitKey(1)
+            if key == ord('s'):
+                startGame = True
+                initialTime = time.time()
+                stateResult = False
+                resultText = ""
+            if key == ord('m'):
+                mode = "menu"
+                cap1.release()
+                cap2.release()
+                break
