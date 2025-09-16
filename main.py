@@ -1,204 +1,3 @@
-# import random
-# import cv2 #OpenCV: xử lý ảnh, video, đọc camera, hiện thị cửa sổ, xử lý ảnh nền
-# import cvzone # thư viện hỗ trợ built-in trên openCV
-# from cvzone.HandTrackingModule import HandDetector
-# import time
-#
-# #khởi tạo camera
-# cap = cv2.VideoCapture(0) #-> mở webcam mặc định là 0
-# cap.set(3, 640) #→ đặt chiều rộng frame = 640 px.
-# cap.set(4, 480) #→ đặt chiều cao frame = 480 px
-#
-# detector = HandDetector(maxHands=1) # -> chỉ nhận diện tối đa 1 bàn tay (của người chơi ) & HandDetector là class của cvzone
-#
-# timer = 0  # biến đếm thời gian cho mỗi lượt chơi
-# stateResult = False # = False → đang đếm thời gian; = True → đã có kết quả.
-# startGame = False # False → chưa bắt đầu; True → đang chơi.
-# scores = [0, 0]  # lưu điểm [AI, Player]
-#
-# while True:
-#     imgBG = cv2.imread("Resources/BG.png") # ảnh nền (layout game)
-#     success, img = cap.read() # đọc một frame từ webcam, success = true nếu lấy được ảnh, img= frame gốc từ camera
-#
-#     #-> cách chia tỷ lệ trên máy
-#     imgScaled = cv2.resize(img, (0, 0), None, 0.875, 0.875)
-#     imgScaled = imgScaled[:, 80:480]
-#
-#     # Find Hands
-#     hands, img = detector.findHands(imgScaled)  # with draw
-#
-#     if startGame:
-#         if stateResult is False:
-#             timer = time.time() - initialTime
-#             cv2.putText(imgBG, str(int(timer)), (605, 435), cv2.FONT_HERSHEY_PLAIN, 6, (255, 0, 255), 4)
-#
-#             if timer > 3:
-#                 stateResult = True
-#                 timer = 0
-#                 if hands:
-#                     playerMove = None
-#                     hand = hands[0]
-#                     fingers = detector.fingersUp(hand)
-#                     if fingers == [0, 0, 0, 0, 0]:
-#                         playerMove = 1
-#                     if fingers == [1, 1, 1, 1, 1]:
-#                         playerMove = 2
-#                     if fingers == [0, 1, 1, 0, 0]:
-#                         playerMove = 3
-#
-#                     randomNumber = random.randint(1, 3)
-#                     imgAI = cv2.imread(f'Resources/{randomNumber}.png', cv2.IMREAD_UNCHANGED)
-#                     imgBG = cvzone.overlayPNG(imgBG, imgAI, (149, 310))
-#
-#                     # Player Wins
-#                     if (playerMove == 1 and randomNumber == 3) or \
-#                             (playerMove == 2 and randomNumber == 1) or \
-#                             (playerMove == 3 and randomNumber == 2):
-#                         scores[1] += 1
-#
-#                     # AI Wins
-#                     if (playerMove == 3 and randomNumber == 1) or \
-#                             (playerMove == 1 and randomNumber == 2) or \
-#                             (playerMove == 2 and randomNumber == 3):
-#                         scores[0] += 1
-#
-#     imgBG[234:654, 795:1195] = imgScaled
-#
-#     if stateResult:
-#         imgBG = cvzone.overlayPNG(imgBG, imgAI, (149, 310))
-#
-#     cv2.putText(imgBG, str(scores[0]), (410, 215), cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
-#     cv2.putText(imgBG, str(scores[1]), (1112, 215), cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
-#
-#     # cv2.imshow("Image", img)
-#     cv2.imshow("BG", imgBG)
-#     # cv2.imshow("Scaled", imgScaled)
-#
-#     key = cv2.waitKey(1)
-#     if key == ord('s'):
-#         startGame = True
-#         initialTime = time.time()
-#         stateResult = False
-
-# import random
-# import cv2 #OpenCV: xử lý ảnh, video, đọc camera, hiện thị cửa sổ, xử lý ảnh nền
-# import cvzone # thư viện hỗ trợ built-in trên openCV
-# from cvzone.HandTrackingModule import HandDetector
-# import time
-#
-# #khởi tạo camera
-# cap = cv2.VideoCapture(0) #-> mở webcam mặc định là 0
-# cap.set(3, 640) #→ đặt chiều rộng frame = 640 px.
-# cap.set(4, 480) #→ đặt chiều cao frame = 480 px
-#
-# detector = HandDetector(maxHands=1) # -> chỉ nhận diện tối đa 1 bàn tay (của người chơi ) & HandDetector là class của cvzone
-#
-# timer = 0
-# stateResult = False # = False → đang đếm thời gian; = True → đã có kết quả.
-# startGame = False # False → chưa bắt đầu; True → đang chơi.
-# scores = [0, 0]  # lưu điểm [AI, Player]
-# resultText = ""
-# while True:
-#     imgBG = cv2.imread("Resources/BG.png") # ảnh nền (layout game)
-#     success, img = cap.read() # đọc một frame từ webcam, success = true nếu lấy được ảnh, img= frame gốc từ camera
-#
-#     #-> cách chia tỷ lệ trên máy
-#     imgScaled = cv2.resize(img, (0, 0), None, 0.875, 0.875)
-#     imgScaled = imgScaled[:, 80:480]
-#
-#     # Find Hands
-#     hands, img = detector.findHands(imgScaled)  # with draw
-#
-#     if startGame:
-#         if stateResult is False:
-#             timer = time.time() - initialTime
-#             cv2.putText(imgBG, str(int(timer)), (605, 435), cv2.FONT_HERSHEY_PLAIN, 6, (255, 0, 255), 4)
-#
-#             if timer > 3:
-#                 stateResult = True
-#                 timer = 0
-#
-#                 if hands:
-#                     playerMove = None
-#                     hand = hands[0]
-#                     fingers = detector.fingersUp(hand)
-#                     if fingers == [0, 0, 0, 0, 0]:
-#                         playerMove = 1
-#                     if fingers == [1, 1, 1, 1, 1]:
-#                         playerMove = 2
-#                     if fingers == [0, 1, 1, 0, 0]:
-#                         playerMove = 3
-#
-#                     randomNumber = random.randint(1, 3)
-#                     imgAI = cv2.imread(f'Resources/{randomNumber}.png', cv2.IMREAD_UNCHANGED)
-#                     imgBG = cvzone.overlayPNG(imgBG, imgAI, (149, 310))
-#
-#                     # Player Wins
-#                     if (playerMove == 1 and randomNumber == 3) or \
-#                             (playerMove == 2 and randomNumber == 1) or \
-#                             (playerMove == 3 and randomNumber == 2):
-#                         scores[1] += 1
-#                         resultText = "You win"
-#                     # AI Wins
-#                     elif (playerMove == 3 and randomNumber == 1) or \
-#                             (playerMove == 1 and randomNumber == 2) or \
-#                             (playerMove == 2 and randomNumber == 3):
-#                         scores[0] += 1
-#                         resultText = "AI Wins!"
-#                     else:
-#
-#                         resultText = "Draw"
-#                 else:
-#                     resultText = "AI Wins!"
-#                     scores[0] += 1
-#                     randomNumber = random.randint(1, 3)
-#                     imgAI = cv2.imread(f'Resources/{randomNumber}.png', cv2.IMREAD_UNCHANGED)
-#                     imgBG = cvzone.overlayPNG(imgBG, imgAI, (149, 310))
-#
-#     imgBG[234:654, 795:1195] = imgScaled
-#
-#     if stateResult:
-#         imgBG = cvzone.overlayPNG(imgBG, imgAI, (149, 310))
-#     cv2.putText(imgBG, resultText, (550, 435), cv2.FONT_HERSHEY_DUPLEX, 2, (0, 255, 255), 3)
-#     cv2.putText(imgBG, str(scores[0]), (410, 215), cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
-#     cv2.putText(imgBG, str(scores[1]), (1112, 215), cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
-#
-#     # cv2.imshow("Image", img)
-#     cv2.imshow("BG", imgBG)
-#     # cv2.imshow("Scaled", imgScaled)
-#
-#     key = cv2.waitKey(1)
-#     if key == ord('s'):
-#         startGame = True
-#         initialTime = time.time()
-#         stateResult = False
-#         resultText = ""
-
-# def fit_to_box(img, box_w, box_h, mode="center"):
-#     """
-#     Scale + crop ảnh từ camera để khớp đúng với khung (box_w x box_h).
-#     mode = "center" -> crop giữa
-#     mode = "top"    -> ưu tiên giữ phần trên (ví dụ khuôn mặt)
-#     """
-#     h, w, _ = img.shape
-#     scale = max(box_w / w, box_h / h)  # scale sao cho ảnh >= khung
-#     new_w, new_h = int(w * scale), int(h * scale)
-#     img_resized = cv2.resize(img, (new_w, new_h))
-#
-#     # Crop
-#     if mode == "center":
-#         x_start = (new_w - box_w) // 2
-#         y_start = (new_h - box_h) // 2
-#     elif mode == "top":  # giữ phần trên (đầu, mặt)
-#         x_start = (new_w - box_w) // 2
-#         y_start = 0
-#     else:
-#         x_start, y_start = 0, 0
-#
-#     img_cropped = img_resized[y_start:y_start+box_h, x_start:x_start+box_w]
-#     return img_cropped
-
-
 import random
 import cv2
 import cvzone
@@ -311,83 +110,171 @@ while True:
 
     # ------------------- CHẾ ĐỘ MULTI PLAYER -------------------
     elif mode == "multi":
-        cap1 = cv2.VideoCapture(0)  # Player 1 (Laptop cam)
-        cap2 = cv2.VideoCapture(1)  # Player 2 (Iriun cam)
+        # Mở 2 camera 1 lần khi vào chế độ multi
+        cap1 = cv2.VideoCapture(0)  # Player 1 (laptop)
+        cap2 = cv2.VideoCapture(1)  # Player 2 (Iriun)
 
+        if not cap1.isOpened() or not cap2.isOpened():
+            print("Không mở được 2 camera. Quay về menu.")
+            # show message on menu image or just go back
+            mode = "menu"
+            try:
+                cap1.release()
+            except:
+                pass
+            try:
+                cap2.release()
+            except:
+                pass
+            continue
+
+        # load layout
         imgBG = cv2.imread("Resources/BG2.png")
         imgBG = cv2.resize(imgBG, (941, 531))
 
-        detector1 = HandDetector(maxHands=1)
-        detector2 = HandDetector(maxHands=1)
+        # 2 detector tách biệt (1 cho mỗi cam) để tránh trùng lặp trạng thái
+        detector1 = HandDetector(maxHands=1, detectionCon=0.6)
+        detector2 = HandDetector(maxHands=1, detectionCon=0.6)
 
-        # Kích thước khung hiển thị
-        ph, pw = 314, 297
-        pos1 = (61, 172)
-        pos2 = (587, 173)
+        # vị trí & kích thước khung (theo thông tin bạn đã cung cấp)
+        pos1 = (61, 172)  # top-left (x,y) player1
+        pos2 = (587, 173)  # top-left (x,y) player2
+        pw = 297  # width khung
+        ph = 314  # height khung
 
+        # trạng thái local cho chế độ multi
         resultText = ""
+        player1Move, player2Move = None, None
+        imgHand1, imgHand2 = None, None
 
+        # vòng lặp độc lập cho chế độ multi
         while True:
             success1, frame1 = cap1.read()
             success2, frame2 = cap2.read()
 
+            frame_ok = True
+            if not success1 or frame1 is None:
+                frame_ok = False
+            if not success2 or frame2 is None:
+                frame_ok = False
+
             imgBG_copy = imgBG.copy()
 
-            if not success1 or not success2:
-                cv2.putText(imgBG_copy, "Khong the truy cap camera!", (300, 360),
+            if not frame_ok:
+                cv2.putText(imgBG_copy, "Khong the truy cap camera!", (250, 300),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
                 cv2.imshow("Rock Paper Scissors", imgBG_copy)
-                cv2.waitKey(1)
+                if cv2.waitKey(1) & 0xFF == ord('m'):
+                    # trở về menu
+                    mode = "menu"
+                    cap1.release()
+                    cap2.release()
+                    break
                 continue
 
-            # ----------- Dùng ảnh gốc để detect ----------
-            hands1, _ = detector1.findHands(frame1, flipType=False)
-            hands2, _ = detector2.findHands(frame2, flipType=False)
 
-            # ----------- Sau đó mới resize để ghép BG ----------
-            img1_resized = cv2.resize(frame1, (pw, ph))
-            img2_resized = cv2.resize(frame2, (pw, ph))
+            # Nếu muốn, flip để giống gương (tùy camera): uncomment nếu cần
+            # frame1 = cv2.flip(frame1, 1)
+            # frame2 = cv2.flip(frame2, 1)
 
-            imgBG_copy[pos1[1]:pos1[1] + ph, pos1[0]:pos1[0] + pw] = img1_resized
-            imgBG_copy[pos2[1]:pos2[1] + ph, pos2[0]:pos2[0] + pw] = img2_resized
+            # --- PHẦN NHẬN DIỆN (an toàn với nhiều phiên bản cvzone) ---
+            # Một số phiên bản trả (hands, img) hoặc (img, hands). Xử lý chung:
+            def find_hands_safe(det, frm):
+                out = det.findHands(frm, draw=False)
+                # out có thể là tuple/list (hands, img) hoặc (img, hands) — ta phát hiện kiểu
+                if isinstance(out, tuple) or isinstance(out, list):
+                    a, b = out
+                    if isinstance(a, list):  # a là hands
+                        return a, b
+                    elif isinstance(b, list):  # b là hands
+                        return b, a
+                    else:
+                        # fallback
+                        return a, b
+                else:
+                    # fallback: không đúng format
+                    return [], frm
 
-            player1Move, player2Move = None, None
 
+            hands1, img1_drawn = find_hands_safe(detector1, frame1.copy())
+            hands2, img2_drawn = find_hands_safe(detector2, frame2.copy())
+
+            # --- resize thumbnail và dán vào background ---
+            try:
+                thumb1 = cv2.resize(frame1, (pw, ph))
+                thumb2 = cv2.resize(frame2, (pw, ph))
+            except:
+                thumb1 = np.zeros((ph, pw, 3), dtype=np.uint8)
+                thumb2 = np.zeros((ph, pw, 3), dtype=np.uint8)
+
+            imgBG_copy[pos1[1]:pos1[1] + ph, pos1[0]:pos1[0] + pw] = thumb1
+            imgBG_copy[pos2[1]:pos2[1] + ph, pos2[0]:pos2[0] + pw] = thumb2
+
+
+            # --- LOGIC GAME: countdown 3 -> 2 -> 1 ---
             if startGame:
                 if not stateResult:
                     timer = time.time() - initialTime
-                    countdown = 4 - int(timer)  # hiển thị 3 → 2 → 1
-
-                    if 1 <= countdown <= 3:
-                        cv2.putText(imgBG_copy, str(countdown), (600, 120),
-                                    cv2.FONT_HERSHEY_PLAIN, 6, (255, 0, 255), 4)
-                    elif countdown <= 0:
+                    countdown = 3 - int(timer)  # 3,2,1, then <=0
+                    if countdown > 0:
+                        # Hiển thị countdown rõ ràng ở giữa
+                        cv2.putText(imgBG_copy, str(countdown), (442, 335),
+                                    cv2.FONT_HERSHEY_PLAIN, 6, (255, 0, 255), 5)
+                    else:
+                        # Hết giờ -> xác định cử chỉ
                         stateResult = True
 
-                        # Player1
+                        # reset trước khi lấy kết quả
+                        player1Move, player2Move = None, None
+
+                        # Lấy cử chỉ P1
                         if hands1:
-                            fingers1 = detector1.fingersUp(hands1[0])
-                            if fingers1 == [0, 0, 0, 0, 0]: player1Move = 1
-                            if fingers1 == [1, 1, 1, 1, 1]: player1Move = 2
-                            if fingers1 == [0, 1, 1, 0, 0]: player1Move = 3
+                            try:
+                                fingers1 = detector1.fingersUp(hands1[0])
+                            except Exception as e:
+                                fingers1 = []
+                            # kiểm tra các mẫu (chú ý: trả về [1,0,..] hoặc [0,1,..])
+                            if fingers1 == [0, 0, 0, 0, 0]:
+                                player1Move = 1
+                            elif fingers1 == [1, 1, 1, 1, 1]:
+                                player1Move = 2
+                            elif fingers1 == [0, 1, 1, 0, 0]:
+                                player1Move = 3
 
-                        # Player2
+                        # Lấy cử chỉ P2
                         if hands2:
-                            fingers2 = detector2.fingersUp(hands2[0])
-                            if fingers2 == [0, 0, 0, 0, 0]: player2Move = 1
-                            if fingers2 == [1, 1, 1, 1, 1]: player2Move = 2
-                            if fingers2 == [0, 1, 1, 0, 0]: player2Move = 3
+                            try:
+                                fingers2 = detector2.fingersUp(hands2[0])
+                            except Exception as e:
+                                fingers2 = []
+                            if fingers2 == [0, 0, 0, 0, 0]:
+                                player2Move = 1
+                            elif fingers2 == [1, 1, 1, 1, 1]:
+                                player2Move = 2
+                            elif fingers2 == [0, 1, 1, 0, 0]:
+                                player2Move = 3
 
-                        # Overlay hình bàn tay
-                        if player1Move:
+                        # # Nếu muốn debug: hiển thị bộ fingers (ngắn)
+                        # if hands1 and 'lmList' in hands1[0]:
+                        #     txt1 = str(detector1.fingersUp(hands1[0]))
+                        #     cv2.putText(imgBG_copy, txt1, (pos1[0], pos1[1] + ph + 20),
+                        #                 cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+                        # if hands2 and 'lmList' in hands2[0]:
+                        #     txt2 = str(detector2.fingersUp(hands2[0]))
+                        #     cv2.putText(imgBG_copy, txt2, (pos2[0], pos2[1] + ph + 20),
+                        #                 cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), 1)
+
+                        # Overlay hình biểu tượng move lên màn hình BG (ví dụ ở giữa khung)
+                        if player1Move is not None:
                             imgHand1 = cv2.imread(f'Resources/{player1Move}.png', cv2.IMREAD_UNCHANGED)
-                            imgBG_copy = cvzone.overlayPNG(imgBG_copy, imgHand1, (200, 350))
-                        if player2Move:
+                            # đặt gần giữa bên trái (tinh chỉnh tuỳ bạn)
+                            imgBG_copy = cvzone.overlayPNG(imgBG_copy, imgHand1, (pos1[0] + 60, pos1[1] + 200))
+                        if player2Move is not None:
                             imgHand2 = cv2.imread(f'Resources/{player2Move}.png', cv2.IMREAD_UNCHANGED)
-                            imgBG_copy = cvzone.overlayPNG(imgBG_copy, imgHand2, (900, 350))
+                            imgBG_copy = cvzone.overlayPNG(imgBG_copy, imgHand2, (pos2[0] + 0, pos2[1] + 200))
 
-                        # So sánh kết quả
-                        if player1Move and player2Move:
+                        # So sánh, cập nhật điểm — chỉ khi cả hai có kết quả
+                        if player1Move is not None and player2Move is not None:
                             if (player1Move == 1 and player2Move == 3) or \
                                     (player1Move == 2 and player2Move == 1) or \
                                     (player1Move == 3 and player2Move == 2):
@@ -400,25 +287,31 @@ while True:
                                 resultText = "Player 2 Wins"
                             else:
                                 resultText = "Draw"
+                        else:
+                            # Nếu 1 trong 2 không detect được cử chỉ:
+                            resultText = "No gesture detected for one player"
 
-            # Hiển thị kết quả và điểm số
-            cv2.putText(imgBG_copy, resultText, (500, 150),
-                        cv2.FONT_HERSHEY_DUPLEX, 2, (0, 255, 255), 3)
-
-            cv2.putText(imgBG_copy, str(scores_multi[0]), (300, 120),
-                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
-            cv2.putText(imgBG_copy, str(scores_multi[1]), (1000, 120),
-                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 6)
+            # Hiển thị trạng thái & điểm
+            # cv2.putText(imgBG_copy, resultText, (400, 150),
+            #             cv2.FONT_HERSHEY_DUPLEX, 2, (255, 255, 0), 3)
+            cv2.putText(imgBG_copy, str(scores_multi[0]), (297, 165),
+                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 0, 0), 6)
+            cv2.putText(imgBG_copy, str(scores_multi[1]), (823, 165),
+                        cv2.FONT_HERSHEY_PLAIN, 4, (255, 0, 0), 6)
 
             cv2.imshow("Rock Paper Scissors", imgBG_copy)
 
-            key = cv2.waitKey(1)
+            # ---- phím điều khiển ----
+            key = cv2.waitKey(1) & 0xFF
             if key == ord('s'):
+                # bắt đầu 1 ván mới
                 startGame = True
                 initialTime = time.time()
                 stateResult = False
                 resultText = ""
+                player1Move, player2Move = None, None
             if key == ord('m'):
+                # quay lại menu
                 mode = "menu"
                 cap1.release()
                 cap2.release()
