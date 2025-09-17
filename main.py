@@ -1,13 +1,13 @@
-import random
-import cv2
-import cvzone
+import random  # chọn ngẫu nhiên hình ảnh kéo búa bao
+import cv2   # bên mediapipe
+import cvzone  # thư viện nhỏ của OpenCV, OpenCv thư viện để lấy hình ảnh tay (cvzone -> chồng ảnh lên ảnh)
 from cvzone.HandTrackingModule import HandDetector
 import time
-import numpy as np
+import numpy as np  # tạo ma trận rỗng khi cần
 
 
 # Khởi tạo camera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)   # khởi tạo cam mặc định, 0: cam chính, 1: cam phụ
 cap.set(3, 640)  # width
 cap.set(4, 480)  # height
 
